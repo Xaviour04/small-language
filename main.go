@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"log"
 	"os"
 )
@@ -21,36 +20,23 @@ func DebugPrintCommand(data [][]byte) {
 }
 
 func Evaluate(data []byte) {
-	lines := bytes.Split(data, []byte("\n"))
+	program, err := tokenizeSourceCode(data)
 
-	variables := make(map[string]int)
-
-	for lineNo, line := range lines {
-		line = bytes.TrimSpace(line)
-
-		if len(line) == 0 {
-			continue
-		}
-
-		tokens, err := Tokenize(line)
-
-		if err != nil {
-			log.Println(err.Error())
-			log.Fatalf("Tokenization error on line %d", lineNo)
-		}
-
-		tokens, err = convertExpressionToPostfix(tokens)
-
-		if err != nil {
-			log.Println(err.Error())
-			log.Fatalf("Tokenization error on line %d", lineNo)
-		}
-
-		evaluateExpression(tokens, variables)
+	if err != nil {
+		log.Println("error: while tokenizing code")
+		log.Fatalln(err)
 	}
 
-	for k, v := range variables {
-		log.Printf("%s = %d", k, v)
+	for program.IsRunning() {
+		err = program.RunLine()
+		if err != nil {
+			log.Printf("error: line %d", program.lineNo+1)
+			log.Fatalln(err)
+		}
+	}
+
+	for k, v := range program.variables {
+		log.Printf("%s = %d", k, v.intValue())
 	}
 }
 
@@ -66,5 +52,4 @@ func main() {
 	ExitOn(err)
 
 	Evaluate(data)
-
 }
