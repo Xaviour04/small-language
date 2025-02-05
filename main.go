@@ -34,10 +34,6 @@ func Evaluate(data []byte) {
 			log.Fatalln(err)
 		}
 	}
-
-	for k, v := range program.variables {
-		log.Printf("%s = %d", k, v.intValue())
-	}
 }
 
 func main() {

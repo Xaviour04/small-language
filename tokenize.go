@@ -223,13 +223,18 @@ func TokenizeLine(line []byte) ([]Token, error) {
 
 	tokensArr := tokens.ToArr()
 
+	keywords := []string{"while", "print"}
+
 	for i, token := range tokensArr {
 		if token.tokenType != TokenIdentifier {
 			continue
 		}
 
-		if token.stringValue() == "while" {
-			tokensArr[i].tokenType = TokenKeyword
+		for _, keyword := range keywords {
+			if token.stringValue() == keyword {
+				tokensArr[i].tokenType = TokenKeyword
+				break
+			}
 		}
 	}
 
